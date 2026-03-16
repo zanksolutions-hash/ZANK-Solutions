@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import {
   BatteryCharging,
   CheckCircle2,
+  ChevronDown,
   Laptop,
   Mail,
   Menu,
@@ -14,7 +15,7 @@ import {
   Wrench,
   X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import logoMark from "./assets/logo-mark.png";
 import logoWordmark from "./assets/logo-wordmark.png";
@@ -24,6 +25,14 @@ import repair2 from "./assets/repairs/repair-2.jpeg";
 import repair3 from "./assets/repairs/repair-3.jpeg";
 import repair4 from "./assets/repairs/repair-4.jpeg";
 import repair5 from "./assets/repairs/repair-5.jpeg";
+import appleLogo from "./assets/brands/apple.png";
+import googleLogo from "./assets/brands/google.png";
+import huaweiLogo from "./assets/brands/huawei.png";
+import oneplusLogo from "./assets/brands/oneplus.png";
+import oppoLogo from "./assets/brands/oppo.svg";
+import redmiLogo from "./assets/brands/redmi.svg";
+import samsungLogo from "./assets/brands/samsung.png";
+import xiaomiLogo from "./assets/brands/xiaomi.png";
 
 const fadeUp = {
   initial: { opacity: 0, y: 18 },
@@ -154,16 +163,14 @@ const iphonePrices = [
 ];
 
 const brands = [
-  "iPhone",
-  "Samsung Galaxy",
-  "Xiaomi",
-  "Huawei",
-  "Oppo",
-  "OnePlus",
-  "Google Pixel",
-  "Tablettes Samsung",
-  "iPad",
-  "Redmi",
+  { name: "Apple", logo: appleLogo },
+  { name: "Samsung", logo: samsungLogo },
+  { name: "Xiaomi", logo: xiaomiLogo },
+  { name: "Huawei", logo: huaweiLogo },
+  { name: "Oppo", logo: oppoLogo },
+  { name: "OnePlus", logo: oneplusLogo },
+  { name: "Google", logo: googleLogo },
+  { name: "Redmi", logo: redmiLogo },
 ];
 
 const testimonials = [
@@ -298,6 +305,28 @@ function SectionTitle({
 function RepairCarousel() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
+  useEffect(() => {
+    if (lightboxIndex === null) {
+      document.body.style.overflow = "";
+      return;
+    }
+
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setLightboxIndex(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [lightboxIndex]);
+
   return (
     <>
       <div className="mt-12 rounded-[2rem] border border-black/10 bg-white p-5 shadow-[0_18px_60px_rgba(0,0,0,0.06)] sm:p-6">
@@ -345,7 +374,7 @@ function RepairCarousel() {
       </div>
 
       {lightboxIndex !== null ? (
-        <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/88 p-4 sm:p-8">
+        <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/88 p-4 sm:p-8" role="dialog" aria-modal="true" aria-label="Galerie de réparations">
           <button
             type="button"
             onClick={() => setLightboxIndex(null)}
@@ -380,6 +409,7 @@ function RepairCarousel() {
 
 export default function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const anydeskTarget = useMemo(() => getAnyDeskTarget(), []);
 
   return (
@@ -408,14 +438,16 @@ export default function App() {
             type="button"
             className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white text-black lg:hidden"
             onClick={() => setMobileOpen((v) => !v)}
-            aria-label="Ouvrir le menu"
+            aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-navigation"
           >
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
 
         {mobileOpen ? (
-          <div className="border-t border-black/5 bg-white lg:hidden">
+          <div id="mobile-navigation" className="border-t border-black/5 bg-white lg:hidden">
             <div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-4">
               <a href="#accueil" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-black/70 hover:bg-black/5 hover:text-black">Accueil</a>
               <a href="#services" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-black/70 hover:bg-black/5 hover:text-black">Services</a>
@@ -449,7 +481,11 @@ export default function App() {
                 <a href="#reparation-gsm" className="rounded-full border border-black/10 bg-white px-6 py-3 text-sm font-medium text-black transition hover:bg-black/5">Voir les réparations</a>
               </div>
 
-              <div className="mt-12 grid gap-4 sm:grid-cols-3">
+              <div className="mt-12">
+                <p className="mb-5 text-sm font-semibold uppercase tracking-[0.18em] text-black/42">
+                  Nous avons une solution
+                </p>
+                <div className="grid gap-4 sm:grid-cols-3">
                 <div className="rounded-[1.75rem] border border-black/8 bg-white p-5 shadow-sm">
                   <p className="text-3xl font-semibold tracking-tight">Simple</p>
                   <p className="mt-2 text-sm text-black/55">Vous comprenez rapidement quelle solution choisir et comment obtenir de l’aide.</p>
@@ -462,6 +498,7 @@ export default function App() {
                   <p className="text-3xl font-semibold tracking-tight">Rapide</p>
                   <p className="mt-2 text-sm text-black/55">Vous pouvez demander une aide, une réparation ou un devis sans perdre de temps.</p>
                 </div>
+                </div>
               </div>
             </motion.div>
 
@@ -471,18 +508,18 @@ export default function App() {
                 <div className="rounded-[1.9rem] bg-[#f5f5f7] p-6 lg:p-8">
                   <img src={logoWordmark} alt="ZANK Solutions" className="mx-auto h-32 w-auto object-contain sm:h-44 lg:h-52" />
                   <div className="mt-7 grid gap-4">
-                    <div className="rounded-2xl bg-white p-5 shadow-sm">
+                    <a href="#services" className="block rounded-2xl bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                       <p className="text-sm font-semibold text-black">Support informatique</p>
                       <p className="mt-2 text-sm leading-6 text-black/55">Vous retrouvez un ordinateur plus stable, plus fluide et plus agréable à utiliser au quotidien.</p>
-                    </div>
-                    <div className="rounded-2xl bg-white p-5 shadow-sm">
+                    </a>
+                    <a href="#reparation-gsm" className="block rounded-2xl bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                       <p className="text-sm font-semibold text-black">Réparation smartphones & tablettes</p>
                       <p className="mt-2 text-sm leading-6 text-black/55">Vous savez rapidement si votre appareil peut être pris en charge et quelle réparation est adaptée.</p>
-                    </div>
-                    <div className="rounded-2xl bg-white p-5 shadow-sm">
+                    </a>
+                    <a href="#support" className="block rounded-2xl bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                       <p className="text-sm font-semibold text-black">Support à distance</p>
                       <p className="mt-2 text-sm leading-6 text-black/55">Vous êtes guidé simplement pour recevoir une aide rapide, sans déplacement inutile.</p>
-                    </div>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -499,8 +536,7 @@ export default function App() {
             />
           </motion.div>
 
-          <div className="relative mt-14">
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-14 bg-gradient-to-l from-[#f5f5f7] to-transparent md:hidden" />
+          <div className="mt-14">
             <div className="hide-scrollbar premium-swipe -mr-5 overflow-x-auto pb-5 pr-2 md:mr-0 md:overflow-visible md:pr-0">
               <div className="flex snap-x snap-mandatory gap-5 pr-8 md:grid md:grid-cols-2 md:gap-6 md:pr-0 xl:grid-cols-4">
               {services.map((service, index) => {
@@ -535,8 +571,7 @@ export default function App() {
               />
             </motion.div>
 
-            <div className="relative mt-14">
-              <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-14 bg-gradient-to-l from-white to-transparent md:hidden" />
+            <div className="mt-14">
               <div className="hide-scrollbar premium-swipe -mr-5 overflow-x-auto pb-5 pr-2 md:mr-0 md:overflow-visible md:pr-0">
                 <div className="flex snap-x snap-mandatory gap-5 pr-8 md:grid md:grid-cols-2 md:gap-6 md:pr-0 xl:grid-cols-3">
               {forfaits.map((forfait, index) => (
@@ -594,16 +629,22 @@ export default function App() {
             />
           </motion.div>
 
-          <div className="mt-10 flex flex-wrap gap-3">
+          <div className="mt-10 flex flex-wrap items-center gap-4">
             {brands.map((brand) => (
-              <span key={brand} className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-medium text-black/70 shadow-sm">{brand}</span>
+              <div
+                key={brand.name}
+                className="flex h-14 min-w-[96px] items-center justify-center rounded-full border border-black/10 bg-white px-5 shadow-sm"
+                title={brand.name}
+                aria-label={brand.name}
+              >
+                <img src={brand.logo} alt={brand.name} className="max-h-6 w-auto object-contain opacity-90" />
+              </div>
             ))}
           </div>
 
           <RepairCarousel />
 
-          <div className="relative mt-14">
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-14 bg-gradient-to-l from-[#f5f5f7] to-transparent md:hidden" />
+          <div className="mt-14">
             <div className="hide-scrollbar premium-swipe -mr-5 overflow-x-auto pb-5 pr-2 md:mr-0 md:overflow-visible md:pr-0">
               <div className="flex snap-x snap-mandatory gap-5 pr-8 md:grid md:grid-cols-3 md:gap-6 md:pr-0">
             {repairCards.map((item, index) => {
@@ -694,8 +735,7 @@ export default function App() {
             />
           </motion.div>
 
-          <div className="relative mt-14">
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-14 bg-gradient-to-l from-[#f5f5f7] to-transparent md:hidden" />
+          <div className="mt-14">
             <div className="hide-scrollbar premium-swipe -mr-5 overflow-x-auto pb-5 pr-2 md:mr-0 md:overflow-visible md:pr-0">
               <div className="flex snap-x snap-mandatory gap-5 pr-8 md:grid md:grid-cols-3 md:gap-6 md:pr-0">
             {testimonials.map((testimonial, index) => (
@@ -720,12 +760,38 @@ export default function App() {
             </motion.div>
 
             <div className="mt-12 space-y-4">
-              {faqs.map((faq, index) => (
-                <motion.div key={faq.q} {...fadeUp} transition={{ ...fadeUp.transition, delay: index * 0.04 }} className="rounded-[1.8rem] border border-black/8 bg-[#f5f5f7] p-7">
-                  <h3 className="text-lg font-semibold tracking-tight text-black">{faq.q}</h3>
-                  <p className="mt-3 text-sm leading-7 text-black/63">{faq.a}</p>
-                </motion.div>
-              ))}
+              {faqs.map((faq, index) => {
+                const isOpen = openFaqIndex === index;
+
+                return (
+                  <motion.div
+                    key={faq.q}
+                    {...fadeUp}
+                    transition={{ ...fadeUp.transition, delay: index * 0.04 }}
+                    className="overflow-hidden rounded-[1.8rem] border border-black/8 bg-[#f5f5f7]"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setOpenFaqIndex((current) => (current === index ? null : index))}
+                      className="flex w-full items-center justify-between gap-4 px-7 py-6 text-left"
+                      aria-expanded={isOpen}
+                      aria-controls={`faq-panel-${index}`}
+                    >
+                      <span className="text-lg font-semibold tracking-tight text-black">{faq.q}</span>
+                      <ChevronDown
+                        size={20}
+                        className={`shrink-0 text-black/55 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+                      />
+                    </button>
+
+                    {isOpen ? (
+                      <div id={`faq-panel-${index}`} className="px-7 pb-7">
+                        <p className="text-sm leading-7 text-black/63">{faq.a}</p>
+                      </div>
+                    ) : null}
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -742,24 +808,23 @@ export default function App() {
               </p>
             </motion.div>
 
-            <div className="relative mt-12">
-              <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-14 bg-gradient-to-l from-[#0a0a0a] to-transparent md:hidden" />
+            <div className="mt-12">
               <div className="hide-scrollbar premium-swipe -mr-5 overflow-x-auto pb-5 pr-2 md:mr-0 md:overflow-visible md:pr-0">
                 <div className="flex snap-x snap-mandatory gap-5 pr-8 md:grid md:grid-cols-3 md:gap-6 md:pr-0">
-                <a href="mailto:info@zanksolutions.be" className="min-w-[82%] snap-start rounded-[2rem] border border-white/10 bg-white/5 p-8 transition hover:bg-white/10 md:min-w-0">
-                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-black"><Mail size={20} /></div>
-                  <p className="text-sm text-white/45">Email</p>
-                  <p className="mt-3 text-lg font-medium text-white">info@zanksolutions.be</p>
+                <a href="https://wa.me/32499469864" className="min-w-[82%] snap-start rounded-[2rem] border border-white/10 bg-white/5 p-8 transition hover:bg-white/10 md:min-w-0">
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-black"><MessageCircle size={20} /></div>
+                  <p className="text-sm text-white/45">WhatsApp</p>
+                  <p className="mt-3 text-lg font-medium text-white">Message rapide</p>
                 </a>
                 <a href="tel:+32499469864" className="min-w-[82%] snap-start rounded-[2rem] border border-white/10 bg-white/5 p-8 transition hover:bg-white/10 md:min-w-0">
                   <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-black"><Phone size={20} /></div>
                   <p className="text-sm text-white/45">Téléphone</p>
                   <p className="mt-3 text-lg font-medium text-white">+32 499 469 864</p>
                 </a>
-                <a href="https://wa.me/32499469864" className="min-w-[82%] snap-start rounded-[2rem] border border-white/10 bg-white/5 p-8 transition hover:bg-white/10 md:min-w-0">
-                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-black"><MessageCircle size={20} /></div>
-                  <p className="text-sm text-white/45">WhatsApp</p>
-                  <p className="mt-3 text-lg font-medium text-white">Message rapide</p>
+                <a href="mailto:info@zanksolutions.be" className="min-w-[82%] snap-start rounded-[2rem] border border-white/10 bg-white/5 p-8 transition hover:bg-white/10 md:min-w-0">
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-black"><Mail size={20} /></div>
+                  <p className="text-sm text-white/45">Email</p>
+                  <p className="mt-3 text-lg font-medium text-white">info@zanksolutions.be</p>
                 </a>
                 </div>
               </div>
