@@ -33,6 +33,7 @@ import oppoLogo from "./assets/brands/oppo.svg";
 import redmiLogo from "./assets/brands/redmi.svg";
 import samsungLogo from "./assets/brands/samsung.png";
 import xiaomiLogo from "./assets/brands/xiaomi.png";
+import CookieBanner from "./components/CookieBanner";
 
 const fadeUp = {
   initial: { opacity: 0, y: 18 },
@@ -401,6 +402,7 @@ function RepairCarousel() {
               </div>
             </div>
           </div>
+        <CookieBanner />
         </div>
       ) : null}
     </>
